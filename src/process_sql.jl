@@ -2,9 +2,11 @@
 using Chain
 using Dates
 
+const PGHOME = "/data/sylvester/data1/users/myersm/postgresql-15.2"
+
 function process_sql(query::String, dtype::Type)
 	@chain begin
-		read(`$(ENV["PGHOME"])/bin/psql -d seal -qtAX -c $query`, String)
+		read(`$PGHOME/bin/psql -d seal -qtAX -c $query`, String)
 		split.(_, '\n')
 		filter(x -> x .!= "", _)
 		String.(_)

@@ -5,8 +5,6 @@ using OrderedCollections
 using Match
 
 const hostname = read(`hostname`, String) |> chomp
-const PGHOME = "$(ENV["PGHOME"])"
-const psql = "$PGHOME/bin/psql"
 
 function exec_query(query::String)::Vector{String}
 	@chain begin
