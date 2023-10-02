@@ -3,6 +3,14 @@ uuid = "565afbc8-cfcc-48e0-815c-9473c9fa058c"
 authors = ["Michael Myers"]
 version = "1.0.0-DEV"
 
+[deps]
+ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+Match = "7eb4fadd-790c-5f42-8a69-bfa0b872bfbf"
+OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+
 [compat]
 julia = "1"
 
