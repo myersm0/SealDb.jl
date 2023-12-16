@@ -42,7 +42,7 @@ function get_functional_run_metadata(d::Dict)::OrderedDict{Int, Dict{String, Any
 	if ks == Set([:session])
 		query = "SELECT * FROM get_functional_run_metadata('$(d[:session])')"
 	elseif ks == Set([:session, :series])
-		"SELECT * FROM get_functional_run_metadata('$(d[:session])', $(d[:series]))"
+		query = "SELECT * FROM get_functional_run_metadata('$(d[:session])', $(d[:series]))"
 	end
 	@chain begin
 		exec_query(query)
