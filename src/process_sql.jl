@@ -1,9 +1,4 @@
 
-using Chain
-using Dates
-
-const dbname = "seal"
-
 function process_sql(query::String, dtype::Type)
 	@chain begin
 		read(`psql -d $dbname -qtAXc $query`, String)
@@ -17,13 +12,11 @@ function process_sql(query::String, dtype::Type)
 		end
 	end
 end
-export process_sql
 
 function get_series(where_clause::String)::Vector{Int}
 	query = "SELECT series FROM runs $where_clause ORDER BY series"
 	process_sql(query, Int)
 end
-export get_series
 
 function get_acq_times(where_clause::String)::Vector{Time}
 	@chain begin
@@ -33,7 +26,6 @@ function get_acq_times(where_clause::String)::Vector{Time}
 		Time.(_, "H:M:S")
 	end
 end
-export get_acq_times
 
 function get_acq_time(session::String, series::Int)::Time
 	where_clause = "WHERE session = '$session' AND series = $series"
@@ -44,7 +36,6 @@ function get_acq_time(session::String, series::Int)::Time
 		Time(_[1], "H:M:S")
 	end
 end
-export get_acq_time
 
 function get_functional_series(session::String; phase::Bool = false)
 	where_clause = 
@@ -73,39 +64,20 @@ function get_fieldmap_series(session::String, ped::String)
 		"""
 	get_series(where_clause)
 end
-export get_fieldmap_series
 
-function get_structural_series(session::String, type::String)
+function get_structural_series(session::String, type::String; vnavs::Bool = false)
 	@assert(type in ("t1w", "t2w"), "Expected type to be `t1w` or `t2w`")
 	pattern = 
 		@match type begin
-			"t2w" => "spcr?_314"
-			"t1w" => "tfl3d1"
+			"t2w" => vnavs ? "spcr?_200" : "spcr?_314"
+			"t1w" => vnavs ? "tfl_me3d1" : "tfl3d1"
 		end
 	where_clause =
 		"""
 			WHERE session = '$session'
 				AND quality = 'usable'
-				AND json->>'SequenceName' ~* '$pattern'
-				AND json->'ImageType' ? 'NORM'
-		"""
-	get_series(where_clause)
-end
-export get_structural_series
-
-function get_structural_series_vnavs(session::String, type::String)
-	@assert(type in ("t1w", "t2w"), "Expected type to be `t1w` or `t2w`")
-	pattern =
-		@match type begin
-			"t2w" => "spcr?_200"
-			"t1w" => "tfl_me3d1"
-		end
-	where_clause =
-		"""
-			WHERE session = '$session'
-			AND quality = 'usable'
-			AND json->>'PulseSequenceName' ~* '$pattern'
-			AND json->'ImageTypeText' ? 'NORM'
+				AND json->>'$(vnavs ? "PulseSequenceName" : "SequenceName")' ~* '$pattern'
+				AND json->'$(vnavs ? "ImageTypeText" : "ImageType")' ? 'NORM'
 		"""
 	get_series(where_clause)
 end

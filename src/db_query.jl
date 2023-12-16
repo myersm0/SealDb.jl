@@ -1,11 +1,4 @@
 
-using JSON
-using Chain
-using OrderedCollections
-using Match
-
-const hostname = read(`hostname`, String) |> chomp
-
 function exec_query(query::String)::Vector{String}
 	@chain begin
 		read(`$psql -d seal -qtAX -c "$query"`, String)
