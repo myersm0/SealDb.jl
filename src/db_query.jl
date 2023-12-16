@@ -37,7 +37,6 @@ function get_functional_runs(d::Dict)::Vector{Int}
 	end
 end
 get_functional_runs(; kwargs...) = get_functional_runs(Dict(kwargs))
-export get_functional_runs
 
 function get_functional_run_metadata(d::Dict)::OrderedDict{Int, Dict{String, Any}}
 	ks = defined_keys(d; relevant = [:session, :series])
@@ -54,7 +53,6 @@ function get_functional_run_metadata(d::Dict)::OrderedDict{Int, Dict{String, Any
 	end
 end
 get_functional_run_metadata(; kwargs...) = get_functional_run_metadata(Dict(kwargs))
-export get_functional_run_metadata
 
 function get_paths(d::Dict)
 	ks = defined_keys(d; relevant = [:session, :label, :series])
@@ -69,7 +67,6 @@ function get_paths(d::Dict)
 	exec_query(query)
 end
 get_paths(; kwargs...) = get_paths(Dict(kwargs))
-export get_paths
 
 function get_sessions(d::Dict)::Vector{String}
 	ks = defined_keys(d; relevant = [:patid, :condition, :project])
@@ -84,7 +81,6 @@ function get_sessions(d::Dict)::Vector{String}
 	exec_query(query)
 end
 get_sessions(; kwargs...) = get_sessions(Dict(kwargs))
-export get_sessions
 
 
 
