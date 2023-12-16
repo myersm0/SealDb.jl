@@ -1,7 +1,7 @@
 
 function exec_query(query::String)::Vector{String}
 	@chain begin
-		read(`$psql -d seal -qtAX -c "$query"`, String)
+		read(`psql -d seal -qtAX -c "$query"`, String)
 		split.(_, '\n')
 		filter(x -> x .!= "", _)
 	end
@@ -24,11 +24,10 @@ end
 
 function get_functional_runs(d::Dict)::Vector{Int}
 	ks = defined_keys(d; relevant = [:session, :protocol])
-	query = @match ks begin
-		Set([:session]) => 
-			"SELECT * FROM get_functional_runs('$(d[:session])')"
-		Set([:session, :protocol]) => 
-			"SELECT * FROM get_functional_runs('$(d[:session])', '$(d[:protocol])')"
+	if ks == Set([:session])
+		query = "SELECT * FROM get_functional_runs('$(d[:session])')"
+	elseif Set([:session, :protocol])
+		query = "SELECT * FROM get_functional_runs('$(d[:session])', '$(d[:protocol])')"
 	end
 	@chain begin
 		exec_query(query)
@@ -40,11 +39,10 @@ get_functional_runs(; kwargs...) = get_functional_runs(Dict(kwargs))
 
 function get_functional_run_metadata(d::Dict)::OrderedDict{Int, Dict{String, Any}}
 	ks = defined_keys(d; relevant = [:session, :series])
-	query = @match ks begin
-		Set([:session]) => 
-			"SELECT * FROM get_functional_run_metadata('$(d[:session])')"
-		Set([:session, :series]) => 
-			"SELECT * FROM get_functional_run_metadata('$(d[:session])', $(d[:series]))"
+	if ks == Set([:session])
+		query = "SELECT * FROM get_functional_run_metadata('$(d[:session])')"
+	elseif ks == Set([:session, :series])
+		"SELECT * FROM get_functional_run_metadata('$(d[:session])', $(d[:series]))"
 	end
 	@chain begin
 		exec_query(query)
@@ -56,13 +54,12 @@ get_functional_run_metadata(; kwargs...) = get_functional_run_metadata(Dict(kwar
 
 function get_paths(d::Dict)
 	ks = defined_keys(d; relevant = [:session, :label, :series])
-	query = @match ks begin
-		Set([:session]) => 
-			"SELECT * FROM get_latest_paths('$(d[:session])')"
-		Set([:session, :label]) => 
-			"SELECT * FROM get_latest_paths('$(d[:session])', '$(d[:label])')"
-		Set([:session, :label, :series]) => 
-			"SELECT * FROM get_latest_path('$(d[:session])', $(d[:series]), '$(d[:label])')"
+	if ks == Set([:session])
+		query = "SELECT * FROM get_latest_paths('$(d[:session])')"
+	elseif ks == Set([:session, :label])
+		query = "SELECT * FROM get_latest_paths('$(d[:session])', '$(d[:label])')"
+	elseif ks == Set([:session, :label, :series])
+		query = "SELECT * FROM get_latest_path('$(d[:session])', $(d[:series]), '$(d[:label])')"
 	end
 	exec_query(query)
 end
@@ -81,6 +78,5 @@ function get_sessions(d::Dict)::Vector{String}
 	exec_query(query)
 end
 get_sessions(; kwargs...) = get_sessions(Dict(kwargs))
-
 
 
