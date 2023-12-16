@@ -7,7 +7,7 @@ using Test
 	@test get_structural_series(session, "t2w") == [14]
 	@test get_fieldmap_series(session, "j") == [15, 21]
 	@test get_fieldmap_series(session, "j-") == [16, 22]
-	@test get_functional_series(session, "j-") == [17, 24]
+	@test get_functional_series(session) == [17, 24]
 	all_series = get_series("WHERE session = '$session'")
 	acq_times = get_acq_time.(session, all_series)
 	@test all(diff(acq_times) .>= Nanosecond(0))
