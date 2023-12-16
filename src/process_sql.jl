@@ -2,11 +2,11 @@
 using Chain
 using Dates
 
-const PGHOME = "/data/sylvester/data1/users/myersm/postgresql-15.2"
+const dbname = "seal"
 
 function process_sql(query::String, dtype::Type)
 	@chain begin
-		read(`$PGHOME/bin/psql -d seal -qtAX -c $query`, String)
+		read(`psql -d $dbname -qtAXc $query`, String)
 		split.(_, '\n')
 		filter(x -> x .!= "", _)
 		String.(_)
@@ -92,4 +92,21 @@ function get_structural_series(session::String, type::String)
 	get_series(where_clause)
 end
 export get_structural_series
+
+function get_structural_series_vnavs(session::String, type::String)
+	@assert(type in ("t1w", "t2w"), "Expected type to be `t1w` or `t2w`")
+	pattern =
+		@match type begin
+			"t2w" => "spcr?_200"
+			"t1w" => "tfl_me3d1"
+		end
+	where_clause =
+		"""
+			WHERE session = '$session'
+			AND quality = 'usable'
+			AND json->>'PulseSequenceName' ~* '$pattern'
+			AND json->'ImageTypeText' ? 'NORM'
+		"""
+	get_series(where_clause)
+end
 
